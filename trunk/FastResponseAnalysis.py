@@ -408,6 +408,18 @@ class FastResponseAnalysis(object):
         print("ns = {}\n\n".format(ns))
         self.ts, self.ns = ts, ns
         return ts, ns
+
+    def unblind_GRB_TS(self):
+        r''' Unblind TS with spatial prior for GRB
+
+        Parameters:
+        -----------
+        self 
+        --------
+        ts, ns: Test statistic and best fit ns
+        '''
+	pass
+
    
     def prior_coincident_events(self):
         r'''Find "coincident events" for a skymap
