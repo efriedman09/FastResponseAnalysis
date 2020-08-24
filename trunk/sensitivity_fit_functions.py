@@ -8,8 +8,8 @@ from glob import glob
 import matplotlib as mpl
 #mpl.use('Agg')
 import matplotlib.pyplot as plt
+import seaborn as sns
  
-
 palette = ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f']
 
 def erfunc(x, a, b):
@@ -208,3 +208,90 @@ def pvals_for_signal(index, delta_t, ns = 1, sigma_units = False, smear=True):
         return pvals
     else:
         return sp.stats.norm.ppf(1. - (pvals / 2.))
+
+def find_all_sens(delta_t, smear=True, with_disc=True, disc_conf=0.5, 
+                    disc_thresh=1.-0.0013, verbose=True):
+    num_alerts = 249
+    sensitivities = np.zeros(num_alerts)
+    if with_disc:
+        discoveries = np.zeros(num_alerts)
+    for ind in range(num_alerts):
+        if verbose:
+            print ind, 
+        try:
+            sens = n_to_flux(calc_sensitivity(ind, delta_t, smear=smear)['sens'], 
+                                ind, delta_t, smear=smear)
+            sensitivities[ind] = sens
+            if with_disc:
+                disc = n_to_flux(calc_sensitivity(ind, delta_t, threshold=disc_thresh, 
+                                    conf_lev=disc_conf, smear=smear)['sens'], ind, delta_t, smear=smear)
+                discoveries[ind] = disc
+            if sens*delta_t*1e6 < 1e-1:
+                if verbose:
+                    print("Problem calculating sensitivity for alert index {}".format(ind))
+        except (IOError, ValueError, IndexError) as err:
+            print(err)
+    if with_disc:
+        return sensitivities, discoveries
+    else:
+        return sensitivities
+
+def ns_fits_contours(index, delta_t, smear=True, levs = [5., 25., 50., 75., 95.]):
+    smear_str = 'smeared/' if smear else 'norm_prob/'
+    levs = np.array(levs)
+    fs = glob('/data/user/apizzuto/fast_response_skylab/alert_event_followup/analysis_trials/fits/{}index_{}_*_time_{:.1f}.pkl'.format(smear_str, index, delta_t))
+    with open(fs[0], 'r') as f:
+        signal_trials = pickle.load(f)
+    true_inj = np.array(signal_trials['true_ns'])
+    ns_fit = np.array(signal_trials['ns_prior'])
+    ninjs = np.unique(true_inj)
+    contours = np.stack([np.percentile(ns_fit[true_inj==ninj], levs) for ninj in ninjs])
+    return ninjs, contours.T
+
+def ns_fits_contours_plot(index, delta_t, smear=True, levs=[5., 25., 50., 75., 95.],
+                      show=False, col='navy green', custom_label = 'Median', ax=None,
+                      xlabel=True, ylabel=True, legend=True):
+    if ax is None:
+        fig, ax = plt.subplots()
+    ninj, fits = ns_fits_contours(index, delta_t, smear=smear, levs=levs)
+    ax.plot(ninj, fits[2], label = custom_label, color = sns.xkcd_rgb[col])
+    ax.fill_between(ninj, fits[0], fits[-1], alpha=0.3,
+                    label='Central 90\%', color = sns.xkcd_rgb[col], lw=0)
+    ax.fill_between(ninj, fits[1], fits[-2], alpha=0.5,
+                    label='Central 50\%', color = sns.xkcd_rgb[col], lw=0)
+    expectation = ninj
+    exp_col = 'dark grey'
+    ax.plot(ninj, expectation, ls = '--', color = sns.xkcd_rgb[exp_col])
+    if legend:
+        ax.legend(loc=4)
+    if xlabel:
+        ax.set_xlabel(r'$n_{\mathrm{inj}}$')
+    ax.set_xlim(0., max(ninj))
+    ax.set_ylim(0., 80)
+    if ylabel:
+        ax.set_ylabel(r'$\hat{n}_{s}$')
+    if show:
+        plt.show()
+
+def fitting_bias_summary(delta_t, sigs=[2., 5., 10.], smear=True, containment=50.):
+    bias = {sig: [] for sig in sigs}; spread = {sig: [] for sig in sigs};
+    levs = [50.-containment / 2., 50., 50.+containment / 2.]
+    for ind in range(249):
+        try:
+            ninjs, contours = ns_fits_contours(ind, delta_t, smear=smear, levs=levs)
+        except:
+            for sig in sigs:
+                bias[sig].append(0.0)
+                spread[sig].append(0.0)
+            continue
+        for sig in sigs:
+            try:
+                n_ind = np.argwhere(ninjs == sig)[0][0]
+                bias[sig].append(contours[1][n_ind])
+                spread[sig].append(contours[-1][n_ind] - contours[0][n_ind])
+            except:
+                bias[sig].append(0.0)
+                spread[sig].append(0.0)
+    return bias, spread
+
+

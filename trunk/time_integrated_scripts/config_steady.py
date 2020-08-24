@@ -58,7 +58,8 @@ def config(alert_ind, seed = 1, scramble = True, e_range=(0,np.inf), g_range=[1.
     #skymap_fits = fits.open(files[alert_ind])[0].data
 
     #Turn this into a function read_alert_event()
-    skymap_files = glob('/data/ana/realtime/alert_catalog_v2/2yr_prelim/fits_files/Run13*.fits.gz')
+    #skymap_files = glob('/data/ana/realtime/alert_catalog_v2/2yr_prelim/fits_files/Run13*.fits.gz')
+    skymap_files = glob('/data/ana/realtime/alert_catalog_v2/fits_files/Run1*.fits.gz')
     #skymap_f = fits.open(skymap_files[alert_ind])
     #skymap_fits = skymap_f[1].data
     #skymap_header = skymap_f[1].header
@@ -90,7 +91,7 @@ def config(alert_ind, seed = 1, scramble = True, e_range=(0,np.inf), g_range=[1.
     if hp.pixelfunc.get_nside(skymap_fits)!=nside:
         skymap_fits = hp.pixelfunc.ud_grade(skymap_fits,nside)
     skymap_fits = skymap_fits/skymap_fits.sum()
-    print(hp.pixelfunc.get_nside(skymap_fits))
+    #print(hp.pixelfunc.get_nside(skymap_fits))
     spatial_prior = SpatialPrior(skymap_fits, containment=0.99)
 
     llh = [] # store individual llh as lists to prevent pointer over-writing
