@@ -78,6 +78,8 @@ def make_rate_plots(time_window, run_table, query_events, dirname, season='neutr
         plt.grid(b = True, axis = 'y', alpha = 0.3)
         plt.savefig('{}/badness_plot.png'.format(dirname))
 
+        print("Liz Tests: Making badness plot")
+
         ########## MAKE RATES PLOTS ##########
         recstart= Time(rates['rec_start'],format='mjd',scale='utc')
         recstop = Time(rates['rec_stop' ],format='mjd',scale='utc')
@@ -101,6 +103,8 @@ def make_rate_plots(time_window, run_table, query_events, dirname, season='neutr
             plt.grid(b = True, axis = 'y', alpha = 0.3)
             plt.savefig('{}/{}_plot.png'.format(dirname, rate))
         
+        print("Liz Tests 2: Making In-Ice-Simple-Multiplicity and filter plots")
+ 
         ########## MAKE GFU RATE PLOT ##########
         fig, ax = plt.subplots(figsize = (12,4))
 
@@ -119,6 +123,8 @@ def make_rate_plots(time_window, run_table, query_events, dirname, season='neutr
         plt.locator_params(axis='x', nbins = 8)
         plt.grid(b = True, axis = 'y', alpha = 0.3)
         plt.savefig('{}/GFU_rate_plot.png'.format(dirname))
+
+        print("Liz Tests 3: Making GFU rate plots")
 
     except:
         print("Times too old to get rate information")

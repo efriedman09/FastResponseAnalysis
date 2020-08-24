@@ -224,7 +224,7 @@ class FastResponseAnalysis(object):
             print("Old times, just grabbing archival data")
             exps, grls = [], []
             for season in ["IC86, 2011", "IC86, 2012", "IC86, 2013", "IC86, 2014",
-                            "IC86, 2015", "IC86, 2016", "IC86, 2017", "IC86, 2018", "IC86, 2019"]:
+                            "IC86, 2015", "IC86, 2016", "IC86, 2017", "IC86, 2018"]:#, "IC86, 2019"]:
                 exp, mc, livetime = dataset.season(season, floor=self.floor)
                 grl = dataset.grl(season)
                 exps.append(exp)
@@ -418,7 +418,7 @@ class FastResponseAnalysis(object):
         --------
         ts, ns: Test statistic and best fit ns
         '''
-	pass
+        return
 
    
     def prior_coincident_events(self):
@@ -810,13 +810,16 @@ class FastResponseAnalysis(object):
         username = subprocess.check_output(['whoami']).decode("utf-8").strip('\n')
         if os.path.isdir('/home/{}/public_html/FastResponse/'.format(username)):
             print("Copying report to {}'s public html in FastResponse Directory".format(username))
-            shutil.copy2(self.analysispath + '/' + self.analysisid + "_report.pdf", 
-                '/home/{}/public_html/FastResponse/{}_report.pdf'.format(username, self.analysisid))
+            print("Liz says (from 'if'): tots JK no I'm not!  I don't have a public html directory for UMD")
+
+#            shutil.copy2(self.analysispath + '/' + self.analysisid + "_report.pdf", 
+#                '/home/{}/public_html/FastResponse/{}_report.pdf'.format(username, self.analysisid))
         else:
             print("Creating FastResponse Directory in {}'s public html and copyting report")
-            os.mkdir('/home/{}/public_html/FastResponse/'.format(username))
-            shutil.copy2(self.analysispath + '/' + self.analysisid + "_report.pdf", 
-                '/home/{}/public_html/FastResponse/{}_report.pdf'.format(username, self.analysisid))
+            print("Liz says (from 'else'): tots JK no I'm not!  I don't have a public html directory for UMD")
+#            os.mkdir('/home/{}/public_html/FastResponse/'.format(username))
+#            shutil.copy2(self.analysispath + '/' + self.analysisid + "_report.pdf", 
+#                '/home/{}/public_html/FastResponse/{}_report.pdf'.format(username, self.analysisid))
 
     def plot_tsd(self):
         r'''Outputs a plot of the background TS distributions

@@ -95,10 +95,14 @@ if not args.nodiag:
     #f.ns_scan()
 results = f.save_results()
 f.generate_report()
-if args.document:
-    subprocess.call(['cp','-r',results['analysispath'],
-        '/home/apizzuto/public_html/FastResponse/webpage/output/{}'.format(results['analysisid'])])
-    utils.updateFastResponseWeb(results)
+
+# Do not update realtime webpage because always gives error on UMD cluster
+
+#if args.document:
+#    subprocess.call(['cp','-r',results['analysispath'],
+#        '/home/apizzuto/public_html/FastResponse/webpage/output/{}'.format(results['analysisid'])])
+#    utils.updateFastResponseWeb(results)
+
 #f.display_results()
 #f.save()
 
